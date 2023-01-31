@@ -3,13 +3,17 @@
 //     return a + b
 // }
 
-
 // 01. IIFE
-var math = math || {};
+// var math = math || {};
 
-(function() {
-  function sum(a, b) {
-      return a + b
-  }
-  math.sum = sum
-})();
+// (function() {
+//   function sum(a, b) {
+//       return a + b
+//   }
+//   math.sum = sum
+// })();
+
+// 02. ES2015, 표준 모듈 시스템
+export function sum(a, b) {
+  return a + b;
+}
