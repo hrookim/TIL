@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,macos,visualstudiocode,vue,vuejs,venv,react,node,nextjs
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,macos,visualstudiocode,vue,vuejs,venv,react,node,nextjs
 
+Lectures_pdf/
+package-lock.json
+
 ### macOS ###
 # General
 .DS_Store
