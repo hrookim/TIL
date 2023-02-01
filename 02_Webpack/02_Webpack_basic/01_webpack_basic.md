@@ -1,6 +1,6 @@
 # 웹팩 (기본)
 
-## 웹팩이 필요한 이유 (배경)
+## 1. 웹팩이 필요한 이유 (배경)
 
 > ES2015(ES6)부터 문법 수준에서 모듈을 지원하기 시작했다.
 >
@@ -96,7 +96,7 @@
 
 
 
-## 엔트리/아웃풋
+## 2. 엔트리/아웃풋
 
 ![image-20230131103524877](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131103524877.png)
 
@@ -113,10 +113,10 @@
 * 번들 작업을 하는 웹팩 패키지와 웹팩 터미널 도구를 설치한다.
 
 * ```bash
-  $ npm i -D webpack@4 webpack-cli --legacy-peer-deps
+  $ npm i webpack webpack-cli --save-dev
   ```
 
-  * 이렇게 설치를 하면 `-D` 옵션 때문에 `package.json`에서 `devDependencies`에 버전이 작성되게 된다.
+  * 이렇게 설치를 하면 `--save-dev` 옵션 때문에 `package.json`에서 `devDependencies`에 버전이 작성되게 된다.
   * ![image-20230131105235137](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131105235137.png)
 
   * 이것은 개발용 패키지라고 보면 된다!
@@ -136,153 +136,154 @@
 
 
 
+* webpack을 실행할 때에는 필수적인 옵션이 3개 있다.
+  1. `--mode`
+  2.  `--entry`: 모듈의 시작점을 의미한다.
+  3.  `--output`: 모든 모듈을 하나로 합치고 저장하는 경로를 설정하는 곳이다.
 
+* 명령어에 직접 입력할 수 있지만, 매번 명령어로 실행할 수 없으므로, 설정파일을 사용한다
 
-## 웹팩 주요 개념 ([공식문서 Concepts](https://v4.webpack.js.org/concepts/))
+  * `webpack.config.js`
 
-> 웹팩은 static module bundler이고, 웹팩이 프로젝트를 처리할 때 내부적으로 dependency graph를 생성한다. 그리고 이 dependency graph에서 프로젝트 내의 모든 모듈을 연결하고, 번들을 생성한다.
->
-> 웹팩 4.0.0 버전 이후로 번들에 configuration file을 필요로 하지 않지만, 개인의 니즈에 맞게 설정이 가능하다.
+  * ```javascript
+    const path = require("path");
+    
+    module.exports = {
+      mode: "development",
+      entry: {
+        main: "./src/app.js",
+      },
+      output: {
+        path: path.resolve("./dist"),
+        filename: "[name].js",
+      },
+    };
+    ```
 
+    > 여기에 있는 `module`은 ES6가 아닌, node.js에서 제공하는 모듈이다!
 
-
-### 1. Entry
-
-* **Entry point**는 내부 dependency graph 빌딩을 시작할 때 사용되는 모듈을 의미한다. 웹팩은 이후 엔트리 포인트와 직/간접적으로 의존되어 있는 모듈과 라이브러리를 찾아나간다. 
-* default로는 `./src/index.js`를 엔트리 포인트로 사용한다. 하지만 웹팩 config에서 다른 파일이나 멀티 엔트리 포인트를 설정할 수 있다.
-
-
-
-**Entry point 설정 방법: webpack.config.js**
-
-```js
-module.exports = {
-  entry: './path/to/my/entry/file.js'
-};
-```
-
-
-
-### 2. Output
-
-* **Output** 속성은, 생성된 번들들을 어디르 emit할지 그리고 어떻게 이 파일(번들)을 명명할지를 설정하는 것이다. 
-* default로는 `./dist/main.js`가 메인 output file이 되고, `./dist` 폴더에 다른 생성된 파일들이 위치하게 된다.
-* 웹팩 config의 `output` 필드에서 이 설정을 변경할 수 있다.
-
-
-
-**Output 설정 방법: webpack.config.js**
-
-```javascript
-const path = require('path');
-
-module.exports = {
-  entry: './path/to/my/entry/file.js',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'my-first-webpack.bundle.js'
-  }
-};
-```
-
-> 이 예시에서,  `output.filename`과 `output.path`속성 사용해서 웹팩이 번들의 이름과 어디로 위치시키면 좋을지를 알려준다. 
->
-> 최상단에 위치한 `path` 모듈은, 코어 Node.js 모듈로 파일 경로를 조작하는데에 사용된다. 
+    * `entry`: 객체를 전달하고, 이때 `main`이라는 키에 엔트리포인트의 경로를 입력한다.
+    * `output`: 객체를 전달하고 그 안에 두개의 키로 필요한 내용을 입력한다.
+      `path`는 output dir명을 입력하는 것이고, 절대경로를 입력한다. node.js의 path 모듈을 가져와서 절대경로를 지정해준다.
+      `filename` 번들링된 파일의 이름이 된다. `[name].js`라고 작성한 것은 entry에서 설정한 키 값인 `main`으로 치환될 것이다! 이렇게 사용하면, 여러 엔트리를 가졌을 때 동적으로 output 파일의 이름을 설정해준다.
 
 
 
-### 3. Loaders
+### 웹팩으로 코드를 번들링하는 과정을, npm script에 등록하는 법
 
-* 웹팩은 JS 혹은 JSON 파일만 이해할 수 있다. 
-* **Loader**는 웹팩이 다른 종류의 파일을 처리하고, 그것들을 유효한 모듈로 변경할 수 있게 하여, 의존성 그래프에 추가한다.
+* `package.json`을 아래와 같이 변경한다.
 
-> 어떤 종류의 모듈이든 `import`를 사용할 수 있는 것은 웹팩의 특징인 것이고, 다른 번들러나 태스크러너에서는 지원되지 않을 수 있다.
-
-* `Loader`는 웹팩 config에서 두개의 속성을 가지고 있다.
-  1. `test`: 어떤 파일(들)이 변형될 것인지를 확인한다.
-  2. `use`: 변형 과정에 어떤 로더를 사용할 것인지를 명시한다.
-
-
-
-**Loader 설정 방법: webpack.config.js**
-
-```javascript
-const path = require('path');
-
-module.exports = {
-  output: {
-    filename: 'my-first-webpack.bundle.js'
+```json
+{
+  ...,
+  "scripts": {
+    "build": "webpack"
   },
-  module: {
-    rules: [
-      { test: /\.txt$/, use: 'raw-loader' }
-    ]
-  }
-};
+  ...
+}
+
 ```
 
->  위 설정해서는 `rules` 속성을 정의했다. (이 속성에는 `test`와 `use`라는 두 속성이 더 필요하다) 위 코드는 아래와 같은 의미를 갖는다.
->
-> "웹팩 컴파일러야, '.txt' 파일을  `require()`/`import` 구문에 포함하고 있는 경로를 발견한다면, `raw-loader`를 사용해서 번들에 추가되기 전에 변형해주렴."
-
-* 주의 사항
-  * `module.rules`에서 설정하는 것이다!
-  * regex를 사용해 매칭되는 파일을 찾는 것이라면, 인용을 하면 안된다. 
-    * `/\.txt$/` *is not the same as* `'/\.txt$/'` *or* `"/\.txt$/"`
-    * 전자는 .txt로 끝나는 어떤 파일이든  웹팩에게 지시하는 것이라면, 후자들은 웹팩에게 절대 경로로 '.txt'인 파일 하나를 의미하는 것이다.  
-  * *추가적인 cumstomization은 loaders 설정 검색해보기*
+> node_modules/.bin 경로는 생략해도 괜찮다. 이를 제외한 실행파일명을 알맞게 작성해주자!
 
 
 
-### 4. Plugins
-
-* loader는 모듈의 특정 타입을 변환하는 데에 사용된다면, **Plugin**은 번들 최적화, 애셋 관리, 환경 변수 주입 등의 넓은 범위의 업무를 수행하는 데에 사용될 수 있다.
-* plugin을 사용하기 위해서는, `require()` 함수로 플러그인을 부르고, `plugins`라는 array에 넣어줘야 한다. 
-* 대부분의 plugin은 옵션을 통해 커스텀할 수 있고, config에서 다른 목적으로 여러번 plugin을 사용할 수 있으므로, `new` 생성자를 통해 새로운 객체로 생성해 놓는 것이 좋다.
 
 
+## 2-1. 엔트리와 아웃풋 [실습]
 
-**Plugins 설정 방법: webpack.config.js**
+npm으로 프로젝트를 셋팅하고, webpack을 셋팅하고, entry와 아웃풋을 설정하고 나면 빌드된 파일이 생기는데, TODO에 빌드한 js 파일을 로딩하는 실습을 해보자!
+
+
+
+
+
+## 3. 로더
+
+* JS는 모든 파일을 모듈로 바라본다. css, image, font 등을 모두 모듈로 보기 때문에 ES6의 `import` 구문을 사용하여 가져올 수 있다.
+* 이것이 가능한 이유가 **Loader** 때문이다.
+
+* 로더를 사용하려면 webpack.config.js의 `module` 객체에 추가해주면 된다.
 
 ```javascript
-const HtmlWebpackPlugin = require('html-webpack-plugin'); //installed via npm
-const webpack = require('webpack'); //to access built-in plugins
+module.exports = {
+  ...
+  module: {
+    // 이 배열 안에 객체로 로더를 넘겨준다!  
+    // 객체는 test와 use라는 키를 가진 객체이다.  
+    rules: [
+      {
+        test: "",
+        use: "",
+      },
+    ],
+  },
+};
 
+```
+
+* `test`: 로더가 처리해야 할 파일의 패턴(정규표현식)을 입력한다.
+* `use`: 사용되는 로더를 입력한다.
+
+
+
+## 3-1. 자주 사용하는 로더
+
+### css-loader
+
+* 설치하기
+
+```bash
+$ npm install css-loader --save-dev
+```
+
+> 버전에 매우 민감! 호환되는지를 확인하고 설치
+
+
+
+* webpack.config 설정 방법
+
+```javascript
 module.exports = {
   module: {
     rules: [
-      { test: /\.txt$/, use: 'raw-loader' }
-    ]
+      {
+        test: /\.css$/, // .css 확장자로 끝나는 모든 파일
+        use: ["css-loader"], // css-loader를 적용한다
+      },
+    ],
   },
-  plugins: [
-    new HtmlWebpackPlugin({template: './src/index.html'})
-  ]
-};
+}
 ```
 
-> 위 예시에서, `html-webpack-plugin`은 모든 생성된 번들을 자동적으로 주입시킴으로써 프로젝트에 HTML 파일을 생성한다. 
-
-* plugin을 사용하는 것은 직관적이다. 하지만 좀 더 알아봐야 하는 용례가 많으니, 더 알아봐라!
 
 
+### style-loader
 
-### 5. Mode
+* 모듈로 변경된 스타일시트는 돔에 추가되어야만 브라우저가 해석할 수 있다.
+* `css-loader`만 사용하면 js 코드로만 변경되었을 뿐, DOM에 적용되지 않았기 때문에 스타일이 적용되지 않는다.
+* `style-loader`는 js로 변경된 스타일을 동적으로 돔에 추가하는 로더, css를 번들링하기 위해서는 이 두 로더를 함께 사용해야 한다.
 
-* **Mode**를 `development`, `production` or `none`로 설정함으로써, 각각의 환경에 맞는 웹팩의 내장 최적화를 사용할 수 있다. 
-* default는 `production`이다.
+
+
+* webpack.config 설정 방법
 
 ```javascript
 module.exports = {
-  mode: 'production'
-};
+  module: {
+    rules: [
+      {
+        test: /\.css$/,
+        use: ["style-loader", "css-loader"], // style-loader를 앞에 추가한다
+      },
+    ],
+  },
+}
 ```
 
-
-
-### 6. Browser Compatibility
-
-웹팩은 ES5+를 지원하는 모든 브라우저에서 지원된다. 웹팩은 `import()`와 `require.ensure()`를 위해  `Promise`를 필요로 한다. 더 오래된 브라우저에서 지원하길 원한다면, polyfill을 로드해야 한다.
+> loader를 읽는 순서가 뒤에서부터 앞이므로, css-loader를 styled-loader보다 뒤에 적는다!
 
 
 
-## 웹팩 시작하기 ([공식문서 Getting Started](https://v4.webpack.js.org/guides/getting-started/))
+### file-loader
+
