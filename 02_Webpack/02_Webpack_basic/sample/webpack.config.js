@@ -10,11 +10,6 @@ module.exports = {
     filename: "[name].js",
   },
   module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: path.resolve("./my-webpack-loader.js"),
-      },
-    ],
+    rules: [{ test: /\.css$/, use: ["style-loader", "css-loader"] }],
   },
 };
