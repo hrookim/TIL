@@ -2,10 +2,16 @@
   "name": "webpack-demo",
   "version": "1.0.0",
   "description": "",
+<<<<<<< HEAD
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack"
+=======
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+>>>>>>> f2c4790eee4c3baeed8797ccc17ad382eb1fc25e
   },
   "keywords": [],
   "author": "",
@@ -13,8 +19,11 @@
   "devDependencies": {
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12"
+<<<<<<< HEAD
   },
   "dependencies": {
     "lodash": "^4.17.21"
+=======
+>>>>>>> f2c4790eee4c3baeed8797ccc17ad382eb1fc25e
   }
 }
