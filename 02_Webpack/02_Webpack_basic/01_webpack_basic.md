@@ -264,6 +264,12 @@ module.exports = {
 
 ### style-loader
 
+* 설치하기
+
+```bash
+$ npm install style-loader --save-dev
+```
+
 * 모듈로 변경된 스타일시트는 돔에 추가되어야만 브라우저가 해석할 수 있다.
 * `css-loader`만 사용하면 js 코드로만 변경되었을 뿐, DOM에 적용되지 않았기 때문에 스타일이 적용되지 않는다.
 * `style-loader`는 js로 변경된 스타일을 동적으로 돔에 추가하는 로더, css를 번들링하기 위해서는 이 두 로더를 함께 사용해야 한다.
@@ -293,6 +299,12 @@ module.exports = {
 
 * CSS뿐만 아니라 소스코드에서 사용하는 모든 파일을 모듈로 사용하게끔 할 수 있따. 
 * `file-loader`: 파일을 모듈 형태로 지원하고 웹팩 아웃풋에 파일을 옮겨주는 것
+
+* 설치하기
+
+```bash
+$ npm install file-loader --save-dev
+```
 
 
 
@@ -350,7 +362,7 @@ module.exports = {
 
 
 
-* webpack.config.js 설정방법
+* webpack.config.js 설정 방법
 
 ```javascript
 module: {
@@ -386,4 +398,85 @@ module: {
 * 사용하는 이미지 갯수가 많다면 네트워크 부담이 많아지고 사이트 성능에도 영향을 줄 수 있다.
 * 만약... 한 페이지에서 작은 이미지를 여러개 사용한다며 **[Data URI Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)**을 사용하는 것이 더 낫다
   * ![image-20230206233452389](01_webpack_basic.assets/image-20230206233452389.png)
-  * 이미지 태그를 쓸 때 src에 경로가 아닌 문자열을 넣을 수 있는데, data 포맷을 지정하고 인코딩 방식을 지정한 후
+  * 이미지 태그를 쓸 때 src에 경로가 아닌 문자열을 넣을 수 있는데, data 포맷을 지정하고 인코딩 방식을 지정한 후 그 값을 넣어주면 이미지로 렌더링한다!
+  * 그래서 작은 파일은 이렇게 바로 html로 넣어주는 것이 효율적이다. (주소를 쓰면 네트워크 통신을 하는데, 이런 방식은 통신을 하지 않기 때문!!!!!!!!!)
+* `url-loader`가 이처럼 base64로 인코딩하여 문자열 형태로 소스코드에 넣어주는 것을 자동화하는 로더이다!!!
+
+* 설치하기
+
+```bash
+$ npm install url-loader --save-dev
+```
+
+
+
+* 예시) 사이즈가 작은 jpg 파일을 가져와서 사용해보자
+
+* app.js
+
+<img src="01_webpack_basic.assets/image-20230206234338273.png" alt="image-20230206234338273" style="zoom:80%;" />
+
+> nyancat을 모듈로 만들어서 import를 했다.
+>
+> DOM이 만들어졌을 때 이미지 태그를 추가하는데, 이 때 이미지는 import한 nyancat이다.
+
+
+
+* jpg 파일은 기본적으로 `file-loader`가 처리할 수 있다.
+* webpack.config.js 설정 방법
+
+```javascript
+  module: {
+    rules: [
+      ...
+      {
+        test: /\.(png|jpg|gif|svg)$/,  // 대표적인 네가지 이미지 파일을 넣는다.
+        loader: 'file-loader',
+        options: {
+          publicPath: './dist/',
+          name: '[name].[ext]?[hash]',
+        },
+      },
+    ],
+  },
+```
+
+* 이렇게 실행하면 `dist/`폴더에 `nyancat.jpg`도 잘 들어가 있고, `index.html`에도 잘 나타나는 것을 확인할 수 있다.
+
+<img src="01_webpack_basic.assets/image-20230206234700637.png" alt="image-20230206234700637" style="zoom:80%;" />
+
+* 그러면, nyancat.jpg의 이미지 크기를 확인해보자
+* <img src="01_webpack_basic.assets/image-20230206234838394.png" alt="image-20230206234838394" style="zoom:80%;" />
+
+> `ll`이라는 명령어란, ls 란 해당 디렉토리에 존재하는 파일목록을 표시해주며, **ll** 이란 **ls 명령어에 -l 옵션을 준 형태**이다. (참고로, -l 옵션은 long 옵션으로 상세히 출력하라는 의미이다.)	
+
+* 18kb로 매우 작은 크기이다. 이런것들은 dist로 옮길 필요없이 base64로 바로 넣어버린다.!!!!	
+
+
+
+* webpack.config.js 설정 방법
+
+```javascript
+  module: {
+    rules: [
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: 'url-loader',  // file-loader -> url-loader
+        options: {
+          publicPath: './dist/',
+          name: '[name].[ext]?[hash]',
+          limit: 20000, 
+          // 20kb, url-loader가 20kb미만 크기의 파일들만 처리를 하고 그 외는 file-loader가 실행된다.
+        },
+
+      },
+    ],
+  },
+```
+
+* `dist/` 폴더를 날린 후, 다시 `npm run build`를 한다. 그리고 `dist/main.js`를 확인해보면..
+
+<img src="01_webpack_basic.assets/image-20230206235718107.png" alt="image-20230206235718107" style="zoom:80%;" />
+
+* 이렇게 base64파일로 변경이 된 것을 알 수 있다!!
