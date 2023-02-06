@@ -1,5 +1,9 @@
 # 웹팩 (기본)
 
+[toc]
+
+
+
 ## 1. 웹팩이 필요한 이유 (배경)
 
 > ES2015(ES6)부터 문법 수준에서 모듈을 지원하기 시작했다.
@@ -287,3 +291,99 @@ module.exports = {
 
 ### file-loader
 
+* CSS뿐만 아니라 소스코드에서 사용하는 모든 파일을 모듈로 사용하게끔 할 수 있따. 
+* `file-loader`: 파일을 모듈 형태로 지원하고 웹팩 아웃풋에 파일을 옮겨주는 것
+
+
+
+* 예시) 이미지 파일을 배경으로 넣고 싶다면
+
+* style.css
+
+```css
+body {
+    background-image: url(bg.png)
+}
+```
+
+* 그리고 `npm run build`를 실행하면, 다음과 같은 에러메시지가 나온다.
+
+<img src="01_webpack_basic.assets/image-20230206231528374.png" alt="image-20230206231528374" style="zoom:80%;" />
+
+> Module parsing에서 에러가 났다. css-loader가 구문에서 `bg.png`를 불러오는데 이것을 불러올 수 없다는 에러
+
+
+
+* webpack.config 설정 방법
+
+```javascript
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.png$/, // .png 확장자로 마치는 모든 파일
+        loader: "file-loader", // 파일 로더를 적용한다
+      },
+    ],
+  },
+}
+```
+
+* 웹팩이 .png파일을 인식해서 file-loader를 실행한다
+* 로더가 동작하고 나면 output 경로에 이미지 파일이 복사되고, 파일명이 해시값으로 변경된다.
+  * 캐시 갱신을 위해서 처리한 것을 보임
+  * 정적파일은 브라우저에서 성능을 위해서 캐싱을 하고 있는데, 파일 내용이 달라지고 이름이 같으면 이전에 저장했던 캐시 내용을 사용한다.
+  * 그래서 이를 예방하는 것이 이름을 해시로 변경해버리는 것이다.
+* 그런데, `index.html`을 실행해서 확인해보면 **이미지가 뜨지 않는다!!!!**
+
+<img src="01_webpack_basic.assets/image-20230206232300354.png" alt="image-20230206232300354" style="zoom:67%;" />
+
+
+
+* why? 브라우저에서 실행된 `index.html`을 보면 알 수 있다.
+
+![image-20230206232424790](01_webpack_basic.assets/image-20230206232424790.png)
+
+* `url()` 내에 작성했던 파일의 이름이 변경되어 있다.
+  * 그런데 이 파일은 `src`폴더가 아닌, `dist`폴더에 있다. 그러므로, `src`에서 부르려는 현재의 동작에서는 파일을 찾을 수 없다는 에러를 반출하는 것이다.
+* 그렇다면, 이를 해결하기 위해 변경을 해보자!!!
+
+
+
+* webpack.config.js 설정방법
+
+```javascript
+module: {
+    rules: [
+      {
+        test: /\.png$/,
+        // use: ['file-loader'], 원래 있던 형태는 지우고 아래를 입력한다.
+        loader: 'file-loader',
+        options: {
+          publicPath: './dist/',
+          name: '[name].[ext]?[hash]'
+        }
+      },
+    ],
+  },
+```
+
+> `loader`의 `options`는 그 로더의 옵션을 지정할 수 있다.
+>
+> * `publicPath`는 파일로더가 처리하는 파일을 모듈로 사용했을 때, 경로부분 앞에 추가되는 문자열이다! 
+>   * 우리가 설정한 output 경로와 동일하게 설정을 하면 된다.
+> * `name`은 파일로더가 output에 복사를 할때 만드는 파일이름의 형태를 지정한다.
+>   * 현재 작성된 형태는, `원본파일명`.`확장자`?`해시`를 해서 우리가 알아보면서도 캐싱에서의 문제점도 해결하게 했다!
+
+* 그러면 이렇게 해결이 되어있다!!!
+
+<img src="01_webpack_basic.assets/image-20230206233138324.png" alt="image-20230206233138324" style="zoom:67%;" />
+
+
+
+### url-loader
+
+* 사용하는 이미지 갯수가 많다면 네트워크 부담이 많아지고 사이트 성능에도 영향을 줄 수 있다.
+* 만약... 한 페이지에서 작은 이미지를 여러개 사용한다며 **[Data URI Scheme](https://en.wikipedia.org/wiki/Data_URI_scheme)**을 사용하는 것이 더 낫다
+  * ![image-20230206233452389](01_webpack_basic.assets/image-20230206233452389.png)
+  * 이미지 태그를 쓸 때 src에 경로가 아닌 문자열을 넣을 수 있는데, data 포맷을 지정하고 인코딩 방식을 지정한 후
