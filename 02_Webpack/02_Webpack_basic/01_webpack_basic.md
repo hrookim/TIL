@@ -238,7 +238,7 @@ module.exports = {
 * 설치하기
 
 ```bash
-$ npm install css-loader --save-dev
+$ npm install css-loader@3 --save-dev
 ```
 
 > 버전에 매우 민감! 호환되는지를 확인하고 설치
@@ -267,7 +267,7 @@ module.exports = {
 * 설치하기
 
 ```bash
-$ npm install style-loader --save-dev
+$ npm install style-loader@1 --save-dev
 ```
 
 * 모듈로 변경된 스타일시트는 돔에 추가되어야만 브라우저가 해석할 수 있다.
@@ -303,7 +303,7 @@ module.exports = {
 * 설치하기
 
 ```bash
-$ npm install file-loader --save-dev
+$ npm install file-loader@5 --save-dev
 ```
 
 
@@ -405,7 +405,7 @@ module: {
 * 설치하기
 
 ```bash
-$ npm install url-loader --save-dev
+$ npm install url-loader@3 --save-dev
 ```
 
 
