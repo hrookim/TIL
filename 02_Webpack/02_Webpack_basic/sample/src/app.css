@@ -1,3 +1,4 @@
 body {
-  background-color: greenyellow;
+  /* background-color: greenyellow; */
+  background-image: url(bg.png);
 }
