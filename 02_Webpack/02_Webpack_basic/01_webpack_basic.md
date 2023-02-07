@@ -631,6 +631,71 @@ module.exports = {
 
 ### DefinePlugin
 
+* 프론트엔드 소스코드는 개발환경과 운영환경을 나눠서 운영한다. 
+* 간혹 환경에 따라 API 서버 주소가 다를 수 있다.
+  * 개발일때는 `test.com/server/api/v1/`
+  * 운영일때는 `test.com/api/v1/`
+* 배포할 때마다 코드를 수정하게 되면 오류가 생길 수 있으니, 환경 의존적인 정보는 소스코드가 아닌 다른 곳에서 관리하는 것이 좋다!!!
+* **웹팩은 이러한 환경 정보를 제공하기 위해 DefinePlugin을 제공한다.**
+
+
+
+* webpack.config.js 설정 방법
+
+```javascript
+const webpack = require('webpack');
+
+module.exports = {
+  mode: 'development',
+  ...
+  plugins: [
+    new webpack.DefinePlugin({}),
+  ],
+};
+
+```
+
+> * 이렇게 빈 객체만 전달해도 기본적으로 넣어주는 값이 있다.
+>   * 노드 환경정보인 `process.env.NODE_ENV`이고, 여기에는 웹팩 설정의 `mode`에 설정한 값이 들어간다.
+>   * 즉 우리 코드에서는 `"development"`가 들어가는 것이다!!
+
+* 실제로 `app.js`에서 `process.env.NODE_ENV`를 확인해보면 아래처럼 나오게 된다.
+
+![image-20230207204515640](01_webpack_basic.assets/image-20230207204515640.png)
+
+
+
+* 그 외 환경변수를 넣고 싶다면, webpack.config.js 설정 방법
+
+```javascript
+const webpack = require('webpack');
+
+module.exports = {
+  mode: 'development',
+  ...
+  plugins: [
+    new webpack.DefinePlugin({
+      TWO: '1+1',
+      THREE: JSON.stringify('1+2')
+      'api.domain': JSON.stringify('http://dev.api.domain.com'),
+    }),
+  ],
+};
+
+```
+
+> 이 때! TWO: `'1+1'`은 string이 아닌 코드이다. 즉 TWO라는 환경변수는 2라는 숫자가 나올 것이다.
+>
+> THREE처럼 작성해야 string 형태로 출력된다.
+>
+> 객체 형태로 넣어주는 것도 가능하다.. (미쳤다)
+
+* 실제 결과를 보면 다음과 같다.
+
+![image-20230207205409479](01_webpack_basic.assets/image-20230207205409479.png)
+
+
+
 ### HtmlWebpackPlugin
 
 ### CleanWebpackPlugin
