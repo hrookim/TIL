@@ -54,7 +54,7 @@
 * JS를 사용하는 모든 환경에서 모듈을 사용하는 것이 목표이다.
 * `exports` 키워드로 모듈을 만들고, `require()` 함수로 불러 들이는 방식
 * 대표적으로 서버 사이드 플랫폼인 <u>Node.js에서 이를 사용한다</u>.
-* <img src="C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131094556061.png" alt="image-20230131094556061" style="zoom:67%;" />
+* <img src="01_webpack_basic.assets/image-20230131094556061.png" alt="image-20230131094556061" style="zoom:67%;" />
 
 #### AMD(Asynchronous Module Definition)
 
@@ -74,17 +74,17 @@
 
 | math.js                                                      | app.js                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| ![image-20230131100236160](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131100236160.png) | ![image-20230131100225577](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131100225577.png) |
+| ![image-20230131100236160](01_webpack_basic.assets/image-20230131100236160.png) | ![image-20230131100225577](01_webpack_basic.assets/image-20230131100225577.png) |
 
 | index.html                                                   |
 | ------------------------------------------------------------ |
-| ![image-20230131100320699](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131100320699.png) |
+| ![image-20230131100320699](01_webpack_basic.assets/image-20230131100320699.png) |
 
 * `script`태그에서 `app.js`만 가져오면 사용할 수 있고, `type="module"`이라는 어트리뷰트를 입력해주면 된다.
 
 * 그러나 이것을 브라우저에서 오픈해보면 CORS 에러가 난다.
 
-* ![image-20230131100436813](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131100436813.png)
+* ![image-20230131100436813](01_webpack_basic.assets/image-20230131100436813.png)
 
   * 브라우저가 바로 파일을 읽지 못해서 생기므로, 서버를 돌려야 한다.
 
@@ -102,7 +102,7 @@
 
 ## 2. 엔트리/아웃풋
 
-![image-20230131103524877](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131103524877.png)
+![image-20230131103524877](01_webpack_basic.assets/image-20230131103524877.png)
 
 > 위처럼 모듈로 파일을 작성하게 되면, 왼쪽처럼 여러 파일이 존재하고 서로 의존해있는 형태를 띄게 된다.
 
@@ -121,7 +121,7 @@
   ```
 
   * 이렇게 설치를 하면 `--save-dev` 옵션 때문에 `package.json`에서 `devDependencies`에 버전이 작성되게 된다.
-  * ![image-20230131105235137](C:\Users\SSAFY\AppData\Roaming\Typora\typora-user-images\image-20230131105235137.png)
+  * ![image-20230131105235137](01_webpack_basic.assets/image-20230131105235137.png)
 
   * 이것은 개발용 패키지라고 보면 된다!
 
