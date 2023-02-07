@@ -698,6 +698,119 @@ module.exports = {
 
 ### HtmlWebpackPlugin
 
+* 3rd party 플러그인으로, HTML 파일을 후처리하는데 사용한다.
+
+
+
+* 패키지 다운로드
+
+```bash
+$ npm install -D html-webpack-plugin@3
+```
+
+* 해당 플러그인을 다운로드한 후, `index.html`을 `src/` 폴더로 옮긴다. (소스로 관리할 것이다!)
+* 그리고 `script`를 지워준다.
+
+
+
+* webpack.config.js 설정 방법
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'development',
+  ...
+  plugins: [
+    new HtmlWebpackPlugin({
+      // 템플릿 경로를 지정
+      template: './src/index.html',
+    }),
+  ],
+};
+
+```
+
+* 이러고 나면, `dist/` 폴더에 `index.html`이 들어간 것을 확인할 수 있다.
+  * 그 안에 우리가 작성하지 않았던 js 로딩 코드가 들어가 있고 output 이름도 들어가 있다.
+  * ![image-20230207210307171](01_webpack_basic.assets/image-20230207210307171.png)
+
+* 그래서 이 index.html을 실행하면, 다른 것은 잘 나오나 `bg.png`가 로딩되지 않는다. 이는 url-loader 설정때문인데..
+
+![image-20230207210526181](01_webpack_basic.assets/image-20230207210526181.png)
+
+* 이미지 경로를 보면 `/dist/dist`가 되어있는 부분이 있다.
+  * 이전에는 프로젝트 루트에 `index.html`이 존재해서, 빌드된 사진을 가져오려면 `dist/`폴더 내부라는 경로를 입력해줘야 했던 것이지만,
+  * 이제는 `dist/`폴더에 `index.html`이 존재해서 그 경로를 없애주면 된다.
+    * 즉, webpack.config.js에서 url-loader의 `publicPath`를 없애준다!!
+
+
+
+* 이 플러그인을 사용하면 개발 환경에 따라 서로 다른 html을 생성해준다.
+  * `src/index.html`의 `<title>`에 ejs 문법의 `<%= env %>`를 넣어준다.
+  * 이 코드는 전달받은 env 변수 값을 출력한다.
+
+* webpack.config.js 설정 방법
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports {
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html', // 템플릿 경로를 지정
+      templateParameters: { // 템플릿에 주입할 파라매터 변수 지정
+        env: process.env.NODE_ENV === 'development' ? '(개발용)' : '',
+      },
+    })
+  ]
+}
+```
+
+> 환경 변수에 따라 타이틀 명 뒤에 "(개발용)" 문자열을 붙이거나 떼거나 하도록 했다. 
+>
+> NODE_ENV=development 로 설정해서 빌드하면 빌드결과 "Document(개발용)"으로 나온다. 
+>
+> NODE_ENV=production 으로 설정해서 빌드하면 빌드결과 "Document"로 나온다.
+
+* 실제 빌드 결과
+
+![image-20230207211337936](01_webpack_basic.assets/image-20230207211337936.png)
+
+
+
+* 운영 환경에서는 파일을 압축하고, 불필요한 주석을 제거하는 것이 좋다.
+* webpack.config.js 설정 방법
+
+```javascript
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports {
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/index.html',
+      templateParameters: {
+        env: process.env.NODE_ENV === 'development' ? '(개발용)' : '',
+      },
+       minify:
+        process.env.NODE_ENV === 'production'
+          ? {
+              collapseWhitespace: true,
+              removeComments: true,
+            }
+          : false,
+    }),
+  ]
+}
+```
+
+> * `collapseWhitespace`: 공백제거
+> * `removeComments`: 주석제거
+
+* 실행 결과 (운영환경일 때)
+
+![image-20230207211742584](01_webpack_basic.assets/image-20230207211742584.png)
+
 ### CleanWebpackPlugin
 
 ### MiniCssExtractPlugin
