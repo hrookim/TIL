@@ -480,3 +480,159 @@ $ npm install url-loader@3 --save-dev
 <img src="01_webpack_basic.assets/image-20230206235718107.png" alt="image-20230206235718107" style="zoom:80%;" />
 
 * 이렇게 base64파일로 변경이 된 것을 알 수 있다!!
+
+
+
+## 4. 플러그인
+
+* 플러그인의 역할: 번들된 결과물을 처리한다.
+  * 번들된 JS 코드를 난독화 하거나 특정 텍스트를 추출하는 용도로 사용한다.
+
+
+
+* 커스텀 플러그인 만들어보기 -> 동작원리를 이해해보자!
+  * 플러그인은 `class`로 정의를 한다 (로더가 함수로 정의된 것과는 다르게,)
+* my-webpack-plugin.js
+
+```javascript
+class MyWebpackPlugin {
+  // compiler라는 객체
+  apply(compiler) {
+    compiler.hooks.done.tap('My Plugin', (stats) => {
+      // 플러그인이 잘 동작했는지를 확인하기 위한 콘솔
+      console.log('MyPlugin: done');
+    });
+  }
+}
+
+module.exports = MyWebpackPlugin;
+```
+
+* webpack.config.js
+
+```javascript
+const path = require('path');
+const MyWebpackPlugin = require('./my-webpack-plugin');
+
+module.exports = {
+  mode: 'development',
+  entry: {
+    main: './src/app.js',
+  },
+  output: {
+    path: path.resolve('./dist'),
+    filename: '[name].js',
+  },
+  module: {
+    rules: [], // 로더가 들어가는 곳
+  },
+  // plugin이 들어가는 곳  
+  plugins: [new MyWebpackPlugin()],
+};
+
+```
+
+> 웹팩 설정 객체의 `plugins` 배열에 설정한다. 
+>
+> 클래스로 제공되는 플러그인의 생성자 함수를 실행해서 넘기는 방식!!
+
+* `npm run build`를 실행해보면 아래와 같은 결과물이 나온다. 그리고 로더와 다르게 번들된 파일에 대해 실행되므로 한번만 실행된 것을 확인할 수 있다.
+* ![image-20230207200950808](01_webpack_basic.assets/image-20230207200950808.png)
+  * 우리 예제에서는 main.js로 결과물이 하나이기 때문에 플러그인이 한 번만 동작한 것이라 추측할 수 있다.
+
+
+
+* **그렇다면, 어떻게 번들된 결과에 접근할 수 있을까???**
+
+```js
+class MyPlugin {
+  apply(compiler) {
+    // compiler.plugin() 함수로 후처리한다
+    compiler.plugin("emit", (compilation, callback) => {
+      const source = compilation.assets["main.js"].source()
+      console.log(source)
+      callback()
+    })
+  }
+}
+```
+
+> `source`가 번들된 결과물인 `main.js`를 그대로 갖고 있는다.
+
+
+
+## 4-1. 자주 사용하는 플러그인
+
+* 개발하면서 플러그인을 직접 작성할 일은 거의 없다. 
+* 웹팩에서 직접 제공하는 플러그인을 사용하거나 3rd party 라이브러리를 찾아 사용하는데, 자주 사용하는 플러그인은 아래와 같다.
+
+
+
+### BannerPlugin
+
+* 결과물에 빌드 정보나 커밋 버전같은 것을 추가할 수 있는 플러그인
+* 웹팩의 기본 제공 플러그인이다.
+
+
+
+* webpack.config.js 설정 방법
+
+```javascript
+const webpack = require('webpack');
+
+module.exports = {
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: '이것은 배너입니다><',
+    }),
+  ],
+};
+```
+
+* dist/main.js 결과물 -> 배너가 삽입된 것을 확인할!
+
+<img src="01_webpack_basic.assets/image-20230207202618310.png" alt="image-20230207202618310" style="zoom:67%;" />
+
+
+
+* 이것을 더 의미있게 사용한다면..
+  * 빌드의 일시와 커밋 버전, 그리고 작업자의 이름을 넣을 수 있따.
+* webpack.config.js 설정 방법
+
+```java
+const webpack = require('webpack');
+const childProcess = require('child_process'); 
+
+module.exports = {
+  // 생략
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: `
+        Build Date: ${new Date().toLocaleString()}
+        Commit Version: ${childProcess.execSync('git rev-parse --short HEAD')}
+        Author: ${childProcess.execSync('git config user.name')}
+      `,
+    }),
+  ],
+};
+
+```
+
+> * `'child_process'`는 node.js의 내장 모듈로, 이것을 사용하면 터미널의 명령어를 실행할 수 있다.
+>
+> * 현재 배너에는 tempalte literal로 js 코드 실행된 결과들이 들어가 있다.
+> * `childProcess.execSync()`를 이용해서 터미널에 작성하는 명령어를 실행시킬 수 있다.
+
+* 실행 결과
+
+<img src="01_webpack_basic.assets/image-20230207203357086.png" alt="image-20230207203357086" style="zoom:67%;" />
+
+
+
+### DefinePlugin
+
+### HtmlWebpackPlugin
+
+### CleanWebpackPlugin
+
+### MiniCssExtractPlugin
