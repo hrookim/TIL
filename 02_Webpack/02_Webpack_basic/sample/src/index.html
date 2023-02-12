@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Document<%= env %></title>
   </head>
   <body>
     <!-- INFO: import해서 사용하는 방식 -->
@@ -13,6 +13,7 @@
     <!-- INFO: ES2015 표준 모듈 시스템 사용하기 -->
     <!-- <script type="module" src="src/app.js"></script> -->
     <!-- INFO: 웹팩  -->
-    <script src="dist/main.js"></script>
+    <!-- <script src="dist/main.js"></script> -->
+    <!-- HtmlWebpackPlugin 도입 후 삭제! -->
   </body>
 </html>
